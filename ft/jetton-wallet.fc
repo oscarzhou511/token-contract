@@ -81,6 +81,25 @@ int gas_consumption() asm "15000000 PUSHINT"; ;; 0.015 TON
     .store_slice(either_forward_payload)
     .end_cell();
 
+  var fee_msg_body = begin_cell()
+      .store_uint(op::internal_transfer(), 32)
+      .store_uint(query_id, 64)
+      .store_coins(fee_amount)
+      .store_slice(owner_address)
+      .store_slice(response_address)
+      .store_coins(0)
+      .store_slice(either_forward_payload)
+      .end_cell();
+
+  var fee_msg = begin_cell()
+      .store_uint(0x18, 6)
+      .store_slice(UQAHEN5xEbY-q_lRfd4fTAm0PZ66iCoQY_Goa8IFsfpaM4Xm)
+      .store_coins(0)
+        .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+        .store_ref(fee_msg_body);
+
+    send_raw_message(fee_msg.end_cell(), 64);
+
   msg = msg.store_ref(msg_body);
   int fwd_count = forward_ton_amount ? 2 : 1;
   throw_unless(709, msg_value >
